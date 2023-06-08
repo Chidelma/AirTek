@@ -1,22 +1,60 @@
-# How to Run
+# Pulumi Infrastructure Deployment
 
-install docker on your machine: [Install Docker](https://docs.docker.com/engine/install/)
+## Requirements
 
+### Local Requirements
+- Pulumi CLI 
+- Node.js
+- AWS CLI 
 
-Open terminal and run:
-```
-docker-compose up
-```
+### Cloud Requirements
+- AWS account credentials
+- Access to the AWS resources (VPC, EC2, ECS, IAM, etc.)
 
-Open a web browser and navigate to 
-```
-http://localhost:3000
-```
+## AWS Permissions
 
+Make sure the AWS IAM user or role used for deployment has the following permissions:
+- AWSManagedPolicyAmazonECS_FullAccess
+- AWSManagedPolicyAmazonEC2_FullAccess
+- AWSManagedPolicyAmazonECSTaskExecutionRolePolicy
+- AWSManagedPolicyAmazonVPCFullAccess
+- AWSManagedPolicyElasticLoadBalancingFullAccess
 
-# Application Details
+## Instructions
 
-- Web: ASP.NET Core 5.0 Web APP
-  - this application requires an environment variabled called "ApiAddress" which will be the address of the Web Api.
-- API: ASP.NET Core 5.0 Web API
+### 1. Clone the repository
+
+bash`git clone https://github.com/your-username/your-repository.git`
+
+### 2. Install dependencies
+
+bash`cd <folder> && npm i`
+
+### 3. Configure AWS credentials
+
+Make sure your AWS credentials are properly configured. You can set them using the AWS CLI or by setting the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+### 4. Set up the Pulumi stack
+
+bash`pulumi stack init`
+
+### 5. Configure the Pulumi stack
+
+bash`pulumi config set aws:region <your-aws-region>`
+
+### 6. Deploy the infrastructure
+
+bash`pulumi up`
+
+### 7. Access the application
+
+After the deployment is complete, you can access the application using the provider Pulumni output: `http://<load-balancer-dns-name>`
+
+### 8. Clean up
+
+To delete the deployed infrastructure and resources, run:
+
+bash`pulumi destroy`
+
+Note: This will destroy all resources created by the Pulumi stack.
 
