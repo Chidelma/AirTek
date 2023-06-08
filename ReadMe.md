@@ -20,15 +20,19 @@ Make sure the AWS IAM user or role used for deployment has the following permiss
 - AWSManagedPolicyAmazonVPCFullAccess
 - AWSManagedPolicyElasticLoadBalancingFullAccess
 
+## Diagram
+
+You find the diagram (high-level) in the file-name `airtek-diagram.png`
+
 ## Instructions
 
 ### 1. Clone the repository
 
-bash`git clone https://github.com/your-username/your-repository.git`
+`git clone https://github.com/your-username/your-repository.git`
 
 ### 2. Install dependencies
 
-bash`cd <folder> && npm i`
+`cd <folder> && npm i`
 
 ### 3. Configure AWS credentials
 
@@ -36,15 +40,15 @@ Make sure your AWS credentials are properly configured. You can set them using t
 
 ### 4. Set up the Pulumi stack
 
-bash`pulumi stack init`
+`pulumi stack init`
 
 ### 5. Configure the Pulumi stack
 
-bash`pulumi config set aws:region <your-aws-region>`
+`pulumi config set aws:region <your-aws-region>`
 
 ### 6. Deploy the infrastructure
 
-bash`pulumi up`
+`pulumi up`
 
 ### 7. Access the application
 
@@ -54,7 +58,7 @@ After the deployment is complete, you can access the application using the provi
 
 To delete the deployed infrastructure and resources, run:
 
-bash`pulumi destroy`
+`pulumi destroy`
 
 Note: This will destroy all resources created by the Pulumi stack.
 
