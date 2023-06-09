@@ -23,9 +23,11 @@ RUN dotnet publish "infra-web/infra-web.csproj" -c Release -o /app/publish/infra
 # Stage 6: Combine infra-api and infra-web images with NGINX
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal
 WORKDIR /app
-EXPOSE 5000
 
-ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 3000
+EXPOSE 4000
+
+ENV ASPNETCORE_URLS=http://+:4000;http://+:3000
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
@@ -35,4 +37,4 @@ USER appuser
 COPY --from=publish /app/publish/infra-api /app/infra-api
 COPY --from=publish /app/publish/infra-web /app/infra-web
 
-CMD ["sh", "-c", "dotnet /app/infra-web/infra-web.dll & dotnet /app/infra-api/infra-api.dll"]
+CMD ["sh", "-c", "dotnet /app/infra-api/infra-api.dll & dotnet /app/infra-web/infra-web.dll"]

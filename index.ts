@@ -10,7 +10,7 @@ const tags = {
 
 const vpc = new awsx.ec2.Vpc(`${project_name}-vpc`, {
   natGateways: {
-    strategy: awsx.ec2.NatGatewayStrategy.Single,
+    strategy: awsx.ec2.NatGatewayStrategy.OnePerAz,
   },
   tags: tags
 });
@@ -35,48 +35,10 @@ const group = new aws.ec2.SecurityGroup(`${project_name}-sg`, {
   tags: tags
 });
 
-const alb = new aws.lb.LoadBalancer(`${project_name}-lb`, {
+const alb = new awsx.lb.ApplicationLoadBalancer(`${project_name}-lb`, {
   securityGroups: [group.id],
-  subnets: vpc.publicSubnetIds,
+  subnetIds: vpc.publicSubnetIds,
   tags: tags
-});
-
-const targetGroup = new aws.lb.TargetGroup(`${project_name}-tg`, {
-  port: 80,
-  protocol: "HTTP",
-  targetType: "ip",
-  vpcId: vpc.vpcId,
-  tags: tags
-});
-
-const listener = new aws.lb.Listener(`${project_name}-web`, {
-  loadBalancerArn: alb.arn,
-  port: 80,
-  defaultActions: [{
-    type: "forward",
-    targetGroupArn: targetGroup.arn,
-  }],
-  tags: tags
-});
-
-const role = new aws.iam.Role(`${project_name}-role`, {
-  assumeRolePolicy: JSON.stringify({
-    Version: "2008-10-17",
-    Statement: [{
-      Action: "sts:AssumeRole",
-      Principal: {
-        Service: "ecs-tasks.amazonaws.com",
-      },
-      Effect: "Allow",
-      Sid: "",
-    }],
-  }),
-  tags: tags
-});
-
-new aws.iam.RolePolicyAttachment(`${project_name}-policy`, {
-  role: role.name,
-  policyArn: aws.iam.ManagedPolicy.AmazonECSTaskExecutionRolePolicy,
 });
 
 // Create a repository to store image for web
@@ -111,12 +73,12 @@ const taskDefinition = new awsx.ecs.FargateTaskDefinition(`${project_name}-td`, 
       essential: true,
       environment: [{
         name: 'ApiAddress',
-        value: `http://i127.0.0.1:5000/WeatherForecast`
+        value: `http://127.0.0.1:5000/WeatherForecast`
       }],
       portMappings: [
         {
-          containerPort: 80,
-          hostPort: 80
+          containerPort: 3000,
+          hostPort: 3000
         }
       ],
     },
@@ -135,10 +97,9 @@ const taskDefinition = new awsx.ecs.FargateTaskDefinition(`${project_name}-td`, 
   }
 });
 
-const service = new aws.ecs.Service(`${project_name}-svc`, {
+const service = new awsx.ecs.FargateService(`${project_name}-svc`, {
   cluster: cluster.arn,
-  desiredCount: 1,
-  launchType: "FARGATE",
+  desiredCount: 2,
   taskDefinition: taskDefinition.taskDefinition.arn,
   networkConfiguration: {
     assignPublicIp: true,
@@ -146,11 +107,11 @@ const service = new aws.ecs.Service(`${project_name}-svc`, {
     securityGroups: [group.id],
   },
   loadBalancers: [{
-    targetGroupArn: targetGroup.arn,
+    targetGroupArn: alb.defaultTargetGroup.arn,
     containerName: "infraweb",
-    containerPort: 80,
+    containerPort: 3000,
   }],
   tags: tags
 });
 
-export const url = pulumi.interpolate`http://${alb.dnsName}`;
+export const url = pulumi.interpolate`http://${alb.loadBalancer.dnsName}`;
