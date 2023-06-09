@@ -22,7 +22,7 @@ Make sure the AWS IAM user or role used for deployment has the following permiss
 
 ## Diagram
 
-You find the diagram (high-level) in the file-name `airtek-diagram.png`
+You find the diagram (high-level) in the file-name `infra-airtek.png`
 
 ### So what does the diagram mean?
 
