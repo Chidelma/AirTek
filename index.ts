@@ -132,7 +132,7 @@ const web_srv = new awsx.ecs.FargateService(`${project_name}-web-srv`, {
     securityGroups: [sg.id]
   },
   cluster: cluster.arn,
-  desiredCount: 2,
+  desiredCount: 50,
   taskDefinition: web_td.taskDefinition.arn,
   tags: tags,
   loadBalancers: [{
@@ -149,7 +149,7 @@ const api_srv = new awsx.ecs.FargateService(`${project_name}-api-srv`, {
     assignPublicIp: false
   },
   cluster: cluster.arn,
-  desiredCount: 2,
+  desiredCount: 50,
   taskDefinition: api_td.taskDefinition.arn,
   tags: tags,
   loadBalancers: [{
