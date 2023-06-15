@@ -159,4 +159,21 @@ const api_srv = new awsx.ecs.FargateService(`${project_name}-api-srv`, {
   }]
 })
 
+const lb_acl = new aws.wafv2.WebAcl(`${project_name}-acl`, {
+  scope: "REGIONAL",
+  defaultAction: {
+    allow: {}
+  },
+  visibilityConfig: {
+    cloudwatchMetricsEnabled: false,
+    metricName: `${project_name}-acl-metric`,
+    sampledRequestsEnabled: false
+  }
+})
+
+const lb_assoc = new aws.wafv2.WebAclAssociation(`${project_name}-assoc`, {
+  resourceArn: web_lb.loadBalancer.arn,
+  webAclArn: lb_acl.arn
+})
+
 export const ecsTaskUrl = pulumi.interpolate`http://${web_lb.loadBalancer.dnsName}`
