@@ -8,6 +8,7 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - curl -fsSL https://get.pulumi.com | sh
+      - export PATH="/root/.pulumi/bin":$PATH
       - npm install
   build:
     commands:
