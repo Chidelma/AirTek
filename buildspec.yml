@@ -14,7 +14,7 @@ phases:
     commands:
       - echo "Building project..."
       - pulumi login
-      - pulumi up dev -y
+      - pulumi up -s dev -y
   post_build:
     commands:
       - echo "Build completed successfully!"
