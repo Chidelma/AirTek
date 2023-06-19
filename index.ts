@@ -38,7 +38,7 @@ const vpc = new awsx.ec2.Vpc(`${project_name}-vpc`, {
   instanceTenancy: "default",
 });
 
-const sg = new aws.ec2.SecurityGroup(`${project_name}-sg`, {
+const sg_web = new aws.ec2.SecurityGroup(`${project_name}-sg-web`, {
     vpcId: vpc.vpcId,
     ingress: [
       {
@@ -63,6 +63,31 @@ const sg = new aws.ec2.SecurityGroup(`${project_name}-sg`, {
     tags: tags
 });
 
+const sg_api = new aws.ec2.SecurityGroup(`${project_name}-sg-api`, {
+  vpcId: vpc.vpcId,
+  ingress: [
+    {
+      fromPort: 5000,
+      toPort: 5000,
+      protocol: "tcp",
+      cidrBlocks: ["0.0.0.0/0"]
+    },
+    {
+      fromPort: 80,
+      toPort: 80,
+      protocol: "tcp",
+      cidrBlocks: ["0.0.0.0/0"]
+    }
+  ],
+  egress: [{
+      fromPort: 0,
+      toPort: 0,
+      protocol: "-1",
+      cidrBlocks: ["0.0.0.0/0"]
+  }],
+  tags: tags
+})
+
 // Create an ECS cluster
 const cluster = new aws.ecs.Cluster(`${project_name}-cluster`, {
   tags: tags
@@ -70,14 +95,14 @@ const cluster = new aws.ecs.Cluster(`${project_name}-cluster`, {
 
 const web_lb = new awsx.lb.ApplicationLoadBalancer(`${project_name}-web-lb`, {
   tags: tags,
-  securityGroups: [sg.id],
+  securityGroups: [sg_web.id],
   subnetIds: vpc.publicSubnetIds
 })
 
 const api_lb = new awsx.lb.ApplicationLoadBalancer(`${project_name}-api-lb`, {
   tags: tags,
   internal: true,
-  securityGroups: [sg.id],
+  securityGroups: [sg_api.id],
   subnetIds: vpc.privateSubnetIds,
   defaultTargetGroup: {
     healthCheck: {
@@ -160,7 +185,7 @@ const web_srv = new awsx.ecs.FargateService(`${project_name}-web-srv`, {
   networkConfiguration: {
     assignPublicIp: true,
     subnets: vpc.publicSubnetIds,
-    securityGroups: [sg.id]
+    securityGroups: [sg_web.id]
   },
   cluster: cluster.arn,
   desiredCount: 50,
@@ -176,7 +201,7 @@ const web_srv = new awsx.ecs.FargateService(`${project_name}-web-srv`, {
 const api_srv = new awsx.ecs.FargateService(`${project_name}-api-srv`, {
   networkConfiguration: {
     subnets: vpc.privateSubnetIds,
-    securityGroups: [sg.id],
+    securityGroups: [sg_api.id],
     assignPublicIp: false
   },
   cluster: cluster.arn,
