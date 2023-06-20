@@ -111,37 +111,6 @@ const api_lb = new awsx.lb.ApplicationLoadBalancer(`${project_name}-api-lb`, {
   }
 })
 
-const api_lstnr = new aws.lb.Listener(`${project_name}-listener`, {
-  loadBalancerArn: api_lb.loadBalancer.arn,
-  tags: tags,
-  port: 80,
-  defaultActions: [
-    {
-      type: 'forward',
-      targetGroupArn: api_lb.defaultTargetGroup.arn
-    }
-  ]
-})
-
-const api_rule = new aws.lb.ListenerRule(`${project_name}-listener-rules`, {
-  listenerArn: api_lstnr.arn,
-  priority: 1,
-  tags: tags,
-  actions: [
-    {
-      type: 'forward',
-      targetGroupArn: api_lb.defaultTargetGroup.arn
-    }
-  ],
-  conditions: [
-    {
-      sourceIp: {
-        values: [api_lstnr.loadBalancerArn]
-      }
-    }
-  ]
-})
-
 const web_td = new awsx.ecs.FargateTaskDefinition(`${project_name}-web-td`, {
   tags: tags,
   containers: {
