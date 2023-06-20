@@ -22,7 +22,7 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: up
-          stack-name: test # When using an individual account, only use stack-name.
+          stack-name: dev # When using an individual account, only use stack-name.
           upsert: true
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
